@@ -1,0 +1,21 @@
+{
+  "name": "aes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "decrypt.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node decrypt",
+    "live": "nodemon initiate"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^22.6.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "nodemon": "^3.1.9"
+  }
+}
