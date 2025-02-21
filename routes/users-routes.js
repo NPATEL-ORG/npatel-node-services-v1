@@ -23,14 +23,9 @@ router.post('/insert', async(req, res) => {
         //     '${lastName}',
         //     '${email}'
         //  );`)
-        const newUser = await pool.query(`SELECT * FROM insert_user_details(
-            ${username},
-            ${adminList.includes(username)? 1 : 2},
-            ${hashedPassword},
-            ${firstName},
-            ${lastName},
-            ${email}
-         );`
+        const newUser = await pool.query(
+            `SELECT * FROM pichub_dev_v1.insert_user_details($1, $2, $3, $4, $5, $6);`,
+            [username, adminList.includes(username) ? 1 : 2, hashedPassword, firstName, lastName, email]
         )
         res.status(201).json({user: newUser})
     } catch (error) {
