@@ -20,4 +20,6 @@ app.use('/', express.static(join(__dirname, 'public')))
 
 app.use('/users', usersRouter)
 
-app.listen(PORT, () => {})
+app.listen(PORT, () => {
+    console.log(`Neura is listening to port ${PORT}`)
+})
