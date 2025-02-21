@@ -25,9 +25,9 @@ router.post('/insert', async(req, res) => {
         if (statusCode === 2000) {
             res.status(201).json({user: newUser.rows})
         } else if ([1001,1002].includes(statusCode)){
-            res.status(409).json({error: newUser.rows.msg})
+            res.status(409).json({error: newUser.rows[0]?.msg})
         } else {
-            res.status(406).json({error: newUser.rows.msg})
+            res.status(406).json({error: newUser.rows[0]?.msg})
         }
     } catch (error) {
         res.status(502).json({error: error.message})
