@@ -1,5 +1,7 @@
-import pg, { Pool } from 'pg'
+import pg from 'pg'
+import dotenv from'dotenv'
 
+dotenv.config()
 const { Pool } = pg
 
 const poolConfig = {
@@ -9,7 +11,6 @@ const poolConfig = {
     port: process.env.PDB_PORT,
     database: process.env.PDB_DB_NAME
 }
-
 const pool = new Pool(poolConfig)
 
 export default pool

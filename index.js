@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import { dirname, join } from 'path'
 import { fileURLToPath } from 'url'
+import usersRouter from './routes/users-routes.js'
 
 dotenv.config()
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -16,5 +17,7 @@ app.use(cors({ corsOption }))
 app.use(json())
 app.use(cookieParser())
 app.use('/', express.static(join(__dirname, 'public')))
+
+app.use('/users', usersRouter)
 
 app.listen(PORT, () => {})
