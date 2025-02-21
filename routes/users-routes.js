@@ -32,7 +32,7 @@ router.post('/insert', async(req, res) => {
             ${email}
          );`
         )
-        res.send(201).json({user: newUser})
+        res.status(201).json({user: newUser})
     } catch (error) {
         res.status(502).json({error: error.message})
     }
