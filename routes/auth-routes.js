@@ -57,12 +57,13 @@ router.post('/login', async( req, res ) => {
                         lastName: rlastname
                     })
                     res.status(200).json({msg, code, ...tokens})
+                    console.log('Tokens generated for', rusername, tokens)
+                    timeLogger({ incident: 'Tokens Generated' })
                 } else {
                     res.status(401).json({msg,code})
                     timeLogger({incident: 'Login Fail'})
                 }
             }
-            return res.status(200).json({msg, code})
         } else {
             res.status(401).json({msg,code})
             timeLogger({incident: 'Login Fail'})
