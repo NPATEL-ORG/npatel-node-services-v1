@@ -2,11 +2,12 @@ import express from 'express'
 import bcrypt from 'bcrypt'
 import { psqlFunctionCaller, timeLogger } from 'spooky-node'
 import databaseConfig from '../configs/database-config.js'
+import { authenticateToken } from '../middleware/authorization.js'
 
 const router = express.Router()
 const adminList = ['sajeethan', 'npatel']
 
-router.post('/insert', async(req, res) => {
+router.post('/signup', async(req, res) => {
     const {
         username,
         email,
@@ -37,6 +38,10 @@ router.post('/insert', async(req, res) => {
         console.log(error)
         timeLogger({incident: 'Neura returns error'})
     }
+})
+
+router.get('/get/list', authenticateToken, async( req, res ) => {
+    res.status(200).json({ req: req.body })
 })
 
 export default router
