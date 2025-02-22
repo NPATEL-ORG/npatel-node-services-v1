@@ -24,7 +24,7 @@ router.post('/insert', async(req, res) => {
             schemaName: databaseConfig.schemaName,
             sqlFunctionName: databaseConfig.psqlFunction_signup
         })
-        console.log('Query answered', newUser.rows)
+        console.log('Query returns', newUser.rows)
         let statusCode = newUser.rows[0]?.code
         if (statusCode === 2000) {
             res.status(201).json({data: newUser.rows[0]})
@@ -35,7 +35,7 @@ router.post('/insert', async(req, res) => {
     } catch (error) {
         res.status(502).json({error: error})
         console.log(error)
-        timeLogger({incident: 'Query failed error'})
+        timeLogger({incident: 'Neura returns error'})
     }
 })
 

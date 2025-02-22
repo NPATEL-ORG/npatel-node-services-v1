@@ -10,7 +10,8 @@ const databaseConfig = {
         database: process.env.PDB_DB_NAME
     },
     schemaName: 'pichub_dev_v1',
-    psqlFunction_signup: 'insert_user_details'
+    psqlFunction_signup: 'insert_user_details',
+    psqlFuntion_login: 'get_password_login_by_email'
 }
 
 export default databaseConfig
