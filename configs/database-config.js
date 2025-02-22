@@ -9,7 +9,8 @@ const databaseConfig = {
         port: process.env.PDB_PORT,
         database: process.env.PDB_DB_NAME
     },
-    schemaName: 'pichub_dev_v1'
+    schemaName: 'pichub_dev_v1',
+    psqlFunction_signup: 'insert_user_details'
 }
 
-export default poolConfig
+export default databaseConfig

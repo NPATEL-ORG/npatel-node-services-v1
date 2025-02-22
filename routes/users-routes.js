@@ -1,6 +1,7 @@
 import express from 'express'
-import pool from '../db.js'
 import bcrypt from 'bcrypt'
+import { psqlFunctionCaller } from 'spooky-node'
+import databaseConfig from '../configs/database-config.js'
 
 const router = express.Router()
 const adminList = ['sajeethan', 'npatel']
@@ -16,10 +17,12 @@ router.post('/insert', async(req, res) => {
     try {
         console.log('user registration initiated with payload :',req.body)
         const hashedPassword = await bcrypt.hash(password, 10)
-        const newUser = await pool.query(
-            `SELECT * FROM pichub_dev_v1.insert_user_details($1, $2, $3, $4, $5, $6);`,
-            [username, adminList.includes(username) ? 1 : 2, hashedPassword, firstName, lastName, email]
-        )
+        const newUser = await psqlFunctionCaller({
+            poolConfig: databaseConfig.poolConfig,
+            params: [username, adminList.includes(username) ? 1 : 2, hashedPassword, firstName, lastName, email],
+            schemaName: databaseConfig.schemaName,
+            sqlFunctionName: databaseConfig.psqlFunction_signup
+        })
         console.log('Query answered')
         let statusCode = newUser.rows[0]?.code
         if (statusCode === 2000) {
@@ -28,7 +31,7 @@ router.post('/insert', async(req, res) => {
             res.status(409).json({error: newUser.rows[0]?.msg})
         }
     } catch (error) {
-        res.status(502).json({error: error.message})
+        res.status(502).json({error: error})
     }
 })
 
