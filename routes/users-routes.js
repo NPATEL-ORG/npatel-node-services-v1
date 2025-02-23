@@ -41,7 +41,23 @@ router.post('/signup', async(req, res) => {
 })
 
 router.get('/get/list', authenticateToken, async( req, res ) => {
-    res.status(200).json({ req: req.body })
+    try {
+        timeLogger({ incident: 'Userlist requested' })
+        const { limit, offset, searchKey } = req.body
+        const userList = await psqlFunctionCaller({
+            poolConfig: databaseConfig.poolConfig,
+            schemaName: databaseConfig.schemaName,
+            sqlFunctionName: databaseConfig.psqlFunction_getUserList,
+            params: [ searchKey, limit, offset ]
+        })
+        if (userList){
+            res.status(200).json({ userList: userList.rows })
+        }
+    } catch (error) {
+        res.status(502).json({error: error})
+        console.log(error)
+        timeLogger({incident: 'Neura returns error'})
+    }
 })
 
 export default router
