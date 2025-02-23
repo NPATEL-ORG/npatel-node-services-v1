@@ -96,4 +96,14 @@ router.get('/refreshToken', ( req, res ) => {
     }
 })
 
+router.delete('/refreshToken', ( req, res ) => {
+    try {
+        res.clearCookie( 'refreshToken' )
+        return res.status(200).json({ message: 'Refresh Token Cleared!', code: 2102})
+    } catch (error) {
+        res.status(500).json({error})
+        timeLogger({incident: 'Neura returns error'})
+    }
+})
+
 export default router
