@@ -80,8 +80,10 @@ router.post('/login', async( req, res ) => {
 
 router.get('/refreshToken', ( req, res ) => {
     try {
+        timeLogger({ incident:'refreshToken applied for regenerate tokens' })
         const refreshToken = req.cookies.refreshToken
         if( refreshToken === null ){
+            timeLogger({ incident: 'Token generation failed'})
             return res.status(401).json({ error: 'Token is missing' })
         }
         jwt.verify( refreshToken, process.env.REFRESH_TOKEN_SECRET, ( error, user ) => {
@@ -89,6 +91,7 @@ router.get('/refreshToken', ( req, res ) => {
             let tokens = jwtTokenGenerator( user )
             res.cookie( 'refreshToken', tokens.refreshToken, { httpOnly: true })
             res.status(200).json({ msg: 'Token regenerated!', code: 2101 , ...tokens })
+            timeLogger({ incident: 'Tokens generated' })
         })
     } catch (error) {
         res.status(500).json({error})
@@ -98,7 +101,9 @@ router.get('/refreshToken', ( req, res ) => {
 
 router.delete('/refreshToken', ( req, res ) => {
     try {
+        timeLogger({ incident: 'Trying for remove refreshToken'})
         res.clearCookie( 'refreshToken' )
+        timeLogger({ incident: 'Refresh token removed' })
         return res.status(200).json({ message: 'Refresh Token Cleared!', code: 2102})
     } catch (error) {
         res.status(500).json({error})
