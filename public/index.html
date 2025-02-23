@@ -1,11 +1,205 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NPATEL Services</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neura Server - NPATEL GROUP LTD</title>
+  <link rel="icon" type="image/png" href="https://www.npatel.co.uk/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #00ffff;
+      --secondary-color: #ffff00;
+      --background-color: #0a0a0a;
+      --text-color: #ffffff;
+      --container-bg: rgba(255, 255, 255, 0.1);
+    }
+
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      padding: 2rem;
+      background: var(--container-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .server-name {
+      font-size: 6rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin: 0;
+      position: relative;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .copyright {
+      font-size: 1.3rem;
+      vertical-align: super;
+      position: relative;
+      top: -10px;
+      color: var(--secondary-color);
+    }
+
+    .server-info {
+      font-size: 1.2rem;
+      color: var(--text-color);
+      margin: 10px 0 0 0;
+    }
+
+    .status-message {
+      font-size: 1.8rem;
+      color: var(--text-color);
+      margin: 20px 0 0 0;
+      position: relative;
+    }
+
+    .status-icon {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      background-color: #2ecc71;
+      border-radius: 50%;
+      margin-right: 10px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+      }
+    }
+
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.5;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--primary-color);
+      animation: float 15s infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) translateX(0); }
+      25% { transform: translateY(-50px) translateX(50px); }
+      50% { transform: translateY(-100px) translateX(-50px); }
+      75% { transform: translateY(-50px) translateX(-100px); }
+    }
+
+    .website-link {
+      display: inline-block;
+      margin-top: 30px;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .website-link:hover {
+      color: var(--secondary-color);
+    }
+
+    @media (max-width: 768px) {
+      .server-name {
+        font-size: 4rem;
+      }
+      .copyright {
+        font-size: 1rem;
+      }
+      .server-info {
+        font-size: 1rem;
+      }
+      .status-message {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .server-name {
+        font-size: 3rem;
+      }
+      .copyright {
+        font-size: 0.8rem;
+      }
+      .server-info {
+        font-size: 0.9rem;
+      }
+      .status-message {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    This endpoint is reserved for NPATEL GROUP LTD services. Please do not take any step forward!!
+  <div class="background"></div>
+  <div class="container">
+    <h1 class="server-name">Neura</h1>
+    <p class="status-message"><span class="status-icon"></span>She is up and running</p>
+    <p class="server-info">Server of NPATEL GROUP LTD® <br> maintained by our skilled developers</p>
+    <a href="https://www.npatel.co.uk" class="website-link" target="_blank" rel="noopener noreferrer">For more details about NPATEL GROUP LTD, visit our website</a>
+  </div>
+
+
+  <script>
+    function createParticle() {
+      const particle = document.createElement('div');
+      particle.classList.add('particle');
+      
+      const size = Math.random() * 5 + 2;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      particle.style.left = `${Math.random() * 100}vw`;
+      particle.style.top = `${Math.random() * 100}vh`;
+      
+      particle.style.opacity = Math.random() * 0.5 + 0.5;
+      
+      document.querySelector('.background').appendChild(particle);
+      
+      setTimeout(() => {
+        particle.remove();
+      }, 15000);
+    }
+
+    for (let i = 0; i < 50; i++) {
+      createParticle();
+    }
+
+    setInterval(createParticle, 300);
+  </script>
+
+
 </body>
 </html>
+
+
