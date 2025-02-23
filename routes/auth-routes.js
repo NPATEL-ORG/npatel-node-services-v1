@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { psqlFunctionCaller, timeLogger } from 'spooky-node'
 import databaseConfig from '../configs/database-config.js'
+import dotenv from'dotenv'
+dotenv.config()
 
 const router = express.Router()
 
@@ -56,6 +58,7 @@ router.post('/login', async( req, res ) => {
                         firstName: rfirstname,
                         lastName: rlastname
                     })
+                    res.cookie( 'refreshToken', tokens.refreshToken, { httpOnly: true })
                     res.status(200).json({msg, code, ...tokens})
                     console.log('Tokens generated for', rusername, tokens)
                     timeLogger({ incident: 'Tokens Generated' })
@@ -69,6 +72,24 @@ router.post('/login', async( req, res ) => {
             timeLogger({incident: 'Login Fail'})
         }
 
+    } catch (error) {
+        res.status(500).json({error})
+        timeLogger({incident: 'Neura returns error'})
+    }
+})
+
+router.get('/refreshToken', ( req, res ) => {
+    try {
+        const refreshToken = req.cookies.refreshToken
+        if( refreshToken === null ){
+            return res.status(401).json({ error: 'Token is missing' })
+        }
+        jwt.verify( refreshToken, process.env.REFRESH_TOKEN_SECRET, ( error, user ) => {
+            if( error ) return res.status(403).json({ error })
+            let tokens = jwtTokenGenerator( user )
+            res.cookie( 'refreshToken', tokens.refreshToken, { httpOnly: true })
+            res.status(200).json({ msg: 'Token regenerated!', code: 2101 , ...tokens })
+        })
     } catch (error) {
         res.status(500).json({error})
         timeLogger({incident: 'Neura returns error'})
