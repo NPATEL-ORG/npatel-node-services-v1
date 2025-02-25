@@ -17,8 +17,8 @@ const corsOption = { credential:true, origin:'*' }
 app.use(cors({ corsOption }))
 app.use(json())
 app.use(cookieParser())
-app.use('/', express.static(join(__dirname, 'public')))
 
+app.use('/', express.static(join(__dirname, 'public')))
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
 
