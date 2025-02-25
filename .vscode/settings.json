@@ -10,6 +10,7 @@
         "rlastname", //output of psql query
         "rpassword", //output of psql query
         "ruserid", //output of psql query
-        "rusername" //output of psql query
+        "rusername", //output of psql query
+        "risverified" //output of psql query - Returned isVerified
     ]
 }

@@ -14,7 +14,7 @@ export const userLoginController = async ( req, res ) => {
 
         const queryResult = await psqlFunctionCaller(loginWithEmailModel(email))
 
-        const { rpassword, msg, code } = queryResult.rows[0]
+        const { risverified, rpassword, msg, code } = queryResult.rows[0]
         console.log('Query Returns', queryResult.rows[0])
 
         if (code === 2000){
@@ -27,7 +27,9 @@ export const userLoginController = async ( req, res ) => {
             timeLogger({incident: 'Login Success'})
             if (validPassword == true) {
                 timeLogger({ incident: 'Get user detail' })
-
+                if ( risverified == false ){
+                    return res.status(200).json({msg, code, risverified})
+                }
                 const userDetail = await psqlFunctionCaller(getUserDetailByEmailModel(email))
 
                 if (userDetail.rows[0].code == 2000){

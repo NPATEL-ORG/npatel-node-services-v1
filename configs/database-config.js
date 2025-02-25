@@ -13,7 +13,8 @@ const databaseConfig = {
     psqlFunction_signup: 'insert_user_details',
     psqlFunction_login: 'get_password_login_by_email',
     psqlFunction_getUserDetail: 'get_user_detail_by_email',
-    psqlFunction_getUserList: 'get_user_list'
+    psqlFunction_getUserList: 'get_user_list',
+    verify_email: 'verify_user'
 }
 
 export default databaseConfig
