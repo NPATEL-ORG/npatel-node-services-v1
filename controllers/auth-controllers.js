@@ -6,6 +6,7 @@ import { getUserDetailByEmailModel, loginWithEmailModel } from "../models/auth-m
 import dotenv from'dotenv'
 import { transporter } from "../configs/nodemailer-config.js"
 import { generateOTPDigits } from "../utils/otp-digits-generator.js"
+import { OTP_storageInserter } from "../storage/otp-storage.js"
 dotenv.config()
 
 export const userLoginController = async ( req, res ) => {
@@ -16,7 +17,7 @@ export const userLoginController = async ( req, res ) => {
 
         const queryResult = await psqlFunctionCaller(loginWithEmailModel(email))
 
-        const { rpassword, msg, code } = queryResult.rows[0]
+        const { risverified, rpassword, msg, code } = queryResult.rows[0]
         console.log('Query Returns', queryResult.rows[0])
 
         if (code === 2000){
@@ -29,7 +30,9 @@ export const userLoginController = async ( req, res ) => {
             timeLogger({incident: 'Login Success'})
             if (validPassword == true) {
                 timeLogger({ incident: 'Get user detail' })
-
+                if ( risverified == false ){
+                    return res.status(200).json({msg, code, risverified})
+                }
                 const userDetail = await psqlFunctionCaller(getUserDetailByEmailModel(email))
 
                 if (userDetail.rows[0].code == 2000){
@@ -106,6 +109,7 @@ export const otpGenerateController = async( req, res ) => {
     try {
         timeLogger({ incident: 'Generate OTP on request' })
         let generatedOTP = generateOTPDigits( { excludeThis : [ '1111', '1619', '0001' ] } )
+        OTP_storageInserter({ mail: req.body.email, otp: generatedOTP })
         transporter.sendMail({
             from: '"PicHub" <no-reply.pichub@auth.npatel.co.uk>',
             to: req.body.email,
@@ -118,8 +122,8 @@ export const otpGenerateController = async( req, res ) => {
             } else {
                 console.log(`OTP generated for ${ req.body.email } : ${ generatedOTP }`)
                 res.status(200).json({ msg: data })
+                timeLogger({ incident: 'OTP Sent' })
             }
-            timeLogger({ incident: 'OTP Generated' })
         })
     } catch (error) {
         res.status(500).json({error})
