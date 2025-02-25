@@ -46,7 +46,6 @@ export const otpVerifyController = async( req, res ) => {
                 timeLogger({ incident: 'OTP verification success' })
                 OTP_storageRemover(req.body.mail)
                 const verification = await psqlFunctionCaller(verifyEmailModel({ email: req.body.email, verify: true }))
-                console.log('-->', verification)
                 res.status(200).json( verification.rows[0] )
             } else {
                 timeLogger({ incident: 'OTP verification failed' })
