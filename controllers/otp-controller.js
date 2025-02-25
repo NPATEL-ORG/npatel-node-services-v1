@@ -1,8 +1,9 @@
 import { transporter } from "../configs/nodemailer-config.js"
 import { generateOTPDigits } from "../utils/otp-digits-generator.js"
 import { OTP_storageInserter, OTP_storageRemover, OTP_viewer } from "../storage/otp-storage.js"
-import dotenv from'dotenv'
-import { timeLogger } from "spooky-node"
+import dotenv from 'dotenv'
+import { psqlFunctionCaller, timeLogger } from "spooky-node"
+import { verifyEmailModel } from "../models/otp-models.js"
 dotenv.config()
 
 export const otpGenerateController = async( req, res ) => {
@@ -43,8 +44,10 @@ export const otpVerifyController = async( req, res ) => {
             let otp = otpObject.otp
             if( otp === req.body.otp ){
                 timeLogger({ incident: 'OTP verification success' })
-                res.status(200).json({ msg: 'OTP Verified.', code: 2201 })
                 OTP_storageRemover(req.body.mail)
+                const verification = await psqlFunctionCaller(verifyEmailModel({ email: req.body.email, verify: true }))
+                console.log('-->', verification)
+                res.status(200).json( verification.rows[0] )
             } else {
                 timeLogger({ incident: 'OTP verification failed' })
                 res.status(401).json({ msg: 'OTP Mismatched.', code: 1201 })
