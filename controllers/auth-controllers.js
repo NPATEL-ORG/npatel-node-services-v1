@@ -6,7 +6,7 @@ import { getUserDetailByEmailModel, loginWithEmailModel } from "../models/auth-m
 import dotenv from'dotenv'
 import { transporter } from "../configs/nodemailer-config.js"
 import { generateOTPDigits } from "../utils/otp-digits-generator.js"
-import { OTP_storageInserter } from "../storage/otp-storage.js"
+import { OTP_storageInserter, OTP_storageRemover, OTP_viewer } from "../storage/otp-storage.js"
 dotenv.config()
 
 export const userLoginController = async ( req, res ) => {
@@ -109,7 +109,7 @@ export const otpGenerateController = async( req, res ) => {
     try {
         timeLogger({ incident: 'Generate OTP on request' })
         let generatedOTP = generateOTPDigits( { excludeThis : [ '1111', '1619', '0001' ] } )
-        OTP_storageInserter({ mail: req.body.email, otp: generatedOTP })
+        OTP_storageInserter({ email: req.body.email, otp: generatedOTP })
         transporter.sendMail({
             from: '"PicHub" <no-reply.pichub@auth.npatel.co.uk>',
             to: req.body.email,
@@ -128,6 +128,31 @@ export const otpGenerateController = async( req, res ) => {
     } catch (error) {
         res.status(500).json({error})
         console.log('Error on OTP generation', error)
+        timeLogger({incident: 'Neura returns error'})
+    }
+}
+
+export const otpVerifyController = async( req, res ) => {
+    try {
+        timeLogger({ incident: 'OTP verification initiated' })
+        const otpObject = OTP_viewer(req.body.email)
+        if ( !otpObject ){
+            timeLogger({ incident: 'Register this email first!' })
+            res.status(401).json({ msg: 'This email is not registered.', code: 1404 })
+        } else {
+            let otp = otpObject.otp
+            if( otp === req.body.otp ){
+                timeLogger({ incident: 'OTP verification success' })
+                res.status(200).json({ msg: 'OTP Verified.', code: 2000 })
+                OTP_storageRemover(req.body.mail)
+            } else {
+                timeLogger({ incident: 'OTP verification failed' })
+                res.status(401).json({ msg: 'OTP Mismatched.', code: 1401 })
+            }
+        }
+    } catch (error) {
+        res.status(500).json({error})
+        console.log('Error on OTP verification', error)
         timeLogger({incident: 'Neura returns error'})
     }
 }
