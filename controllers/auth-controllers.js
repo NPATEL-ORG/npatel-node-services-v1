@@ -106,17 +106,24 @@ export const otpGenerateController = async( req, res ) => {
     try {
         timeLogger({ incident: 'Generate OTP on request' })
         let generatedOTP = generateOTPDigits( { excludeThis : [ '1111', '1619', '0001' ] } )
-        const info = await transporter.sendMail({
+        transporter.sendMail({
             from: '"PicHub" <no-reply.pichub@auth.npatel.co.uk>',
             to: req.body.email,
             subject: "OTP Verification for user registration on NPATEL",
             html:`<html><h1>OTP for PicHub User Registration</h1><p>Your OTP is ${ generatedOTP }</p></html>`
+        }, ( err, data ) => {
+            if (err){
+                res.status(501).json({error : err})
+                timeLogger({incident: 'Neura returns error'})
+            } else {
+                console.log(`OTP generated for ${ req.body.email } : ${ generatedOTP }`)
+                res.status(200).json({ msg: data })
+            }
+            timeLogger({ incident: 'OTP Generated' })
         })
-        console.log(`OTP generated for ${ email } : ${ generatedOTP }`)
-        res.status(200).json({ msg: info })
-        timeLogger({ incident: 'OTP generated' })
     } catch (error) {
         res.status(500).json({error})
+        console.log('Error on OTP generation', error)
         timeLogger({incident: 'Neura returns error'})
     }
 }
