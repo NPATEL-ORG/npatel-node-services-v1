@@ -59,4 +59,16 @@ export const responseObject = [
         code: 1108,
         msg: "OTP Mismatched."
     },
+    {
+        code: 2106,
+        msg: "New user registered."
+    },
+    {
+        code: 1109,
+        msg: "User registration failed."
+    },
+    {
+        code: 2107,
+        msg: "User list fetched."
+    },
 ]
