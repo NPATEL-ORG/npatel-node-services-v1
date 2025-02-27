@@ -71,4 +71,12 @@ export const responseObject = [
         code: 2107,
         msg: "User list fetched."
     },
+    {
+        code: 1401,
+        msg: "Jwt token error."
+    },
+    {
+        code: 1402,
+        msg: "Unauthorized without a token."
+    },
 ]
