@@ -39,4 +39,24 @@ export const responseObject = [
         code: 2102,
         msg: "Refresh Token Cleared."
     },
+    {
+        code: 1106,
+        msg: "OTP mail sending fail."
+    },
+    {
+        code: 2104,
+        msg: "OTP mail sent success."
+    },
+    {
+        code: 1107,
+        msg: "Request for OTP first."
+    },
+    {
+        code: 2105,
+        msg: "Email Verified by OTP."
+    },
+    {
+        code: 1108,
+        msg: "OTP Mismatched."
+    },
 ]
