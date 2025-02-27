@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { jwtTokenGenerator } from "../utils/jwt-helper.js"
 import { getUserDetailByEmailModel, loginWithEmailModel } from "../models/auth-models.js"
 import dotenv from'dotenv'
+import { generalResponseModel } from "../models/response-models.js"
 dotenv.config()
 
 export const userLoginController = async ( req, res ) => {
@@ -21,7 +22,9 @@ export const userLoginController = async ( req, res ) => {
             const validPassword = await bcrypt.compare(password, rpassword)
             if (!validPassword){
                 timeLogger({incident: 'Login Fail'})
-                return res.status(401).json({error: 'Incorrect Password!'})
+                return res.status(401).json(generalResponseModel({
+                    code: 1101,
+                }))
             }
 
             timeLogger({incident: 'Login Success'})
