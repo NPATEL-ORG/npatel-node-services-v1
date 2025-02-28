@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { jwtTokenGenerator } from "../utils/jwt-helper.js"
 import { getUserDetailByEmailModel, loginWithEmailModel } from "../models/auth-models.js"
 import dotenv from'dotenv'
+import { generalResponseModel } from "../models/response-models.js"
 dotenv.config()
 
 export const userLoginController = async ( req, res ) => {
@@ -21,14 +22,19 @@ export const userLoginController = async ( req, res ) => {
             const validPassword = await bcrypt.compare(password, rpassword)
             if (!validPassword){
                 timeLogger({incident: 'Login Fail'})
-                return res.status(401).json({error: 'Incorrect Password!'})
+                return res.status(401).json(generalResponseModel({
+                    code: 1101,
+                }))
             }
 
-            timeLogger({incident: 'Login Success'})
             if (validPassword == true) {
+                timeLogger({incident: 'Login Success'})
                 timeLogger({ incident: 'Get user detail' })
                 if ( risverified == false ){
-                    return res.status(200).json({msg, code, risverified})
+                    return res.status(200).json(generalResponseModel({
+                        code: 1102,
+                        isVerified: risverified
+                    }))
                 }
                 const userDetail = await psqlFunctionCaller(getUserDetailByEmailModel(email))
 
@@ -50,21 +56,24 @@ export const userLoginController = async ( req, res ) => {
                         lastName: rlastname
                     })
                     res.cookie( 'refreshToken', tokens.refreshToken, { httpOnly: true })
-                    res.status(200).json({msg, code, ...tokens})
+                    res.status(200).json(generalResponseModel({
+                        code: 2103, 
+                        ...tokens
+                    }))
                     console.log('Tokens generated for', rusername, tokens)
                     timeLogger({ incident: 'Tokens Generated' })
                 } else {
-                    res.status(401).json({msg,code})
+                    res.status(401).json(generalResponseModel({code:1103, msg}))
                     timeLogger({incident: 'Login Fail'})
                 }
             }
         } else {
-            res.status(401).json({msg,code})
+            res.status(401).json(generalResponseModel({code:1103, msg}))
             timeLogger({incident: 'Login Fail'})
         }
 
     } catch (error) {
-        res.status(500).json({error})
+        res.status(500).json(generalResponseModel({code: 1500, error}))
         timeLogger({incident: 'Neura returns error'})
     }
 }
@@ -75,17 +84,17 @@ export const getTokenByRefreshTokenController = ( req, res ) => {
         const refreshToken = req.cookies.refreshToken
         if( refreshToken === null ){
             timeLogger({ incident: 'Token generation failed'})
-            return res.status(401).json({ error: 'Token is missing' })
+            return res.status(401).json(generalResponseModel({ code: 1104 }))
         }
         jwt.verify( refreshToken, process.env.REFRESH_TOKEN_SECRET, ( error, user ) => {
-            if( error ) return res.status(403).json({ error })
+            if( error ) return res.status(403).json(generalResponseModel({ code:1105, error }))
             let tokens = jwtTokenGenerator( user )
             res.cookie( 'refreshToken', tokens.refreshToken, { httpOnly: true })
-            res.status(200).json({ msg: 'Token regenerated!', code: 2101 , ...tokens })
+            res.status(200).json(generalResponseModel({ code: 2101 , ...tokens }))
             timeLogger({ incident: 'Tokens generated' })
         })
     } catch (error) {
-        res.status(500).json({error})
+        res.status(500).json(generalResponseModel({code: 1500, error}))
         timeLogger({incident: 'Neura returns error'})
     }
 }
@@ -95,9 +104,9 @@ export const clearRefreshTokenCookieController = ( req, res ) => {
         timeLogger({ incident: 'Trying for remove refreshToken'})
         res.clearCookie( 'refreshToken' )
         timeLogger({ incident: 'Refresh token removed' })
-        return res.status(200).json({ message: 'Refresh Token Cleared!', code: 2102})
+        return res.status(200).json(generalResponseModel({code: 2102}))
     } catch (error) {
-        res.status(500).json({error})
+        res.status(500).json(generalResponseModel({code: 1500, error}))
         timeLogger({incident: 'Neura returns error'})
     }
 } 
