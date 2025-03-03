@@ -6,6 +6,7 @@ import { psqlFunctionCaller, timeLogger } from "spooky-node"
 import { verifyEmailModel } from "../models/otp-models.js"
 import { excludedOTPs } from "../configs/admins-config.js"
 import { generalResponseModel } from "../models/response-models.js"
+import { mailTemplate } from "../views/otpMailTemplates/email-template.js"
 dotenv.config()
 
 export const otpGenerateController = async( req, res ) => {
@@ -17,7 +18,7 @@ export const otpGenerateController = async( req, res ) => {
             from: '"PicHub" <no-reply.pichub@auth.npatel.co.uk>',
             to: req.body.email,
             subject: "OTP Verification for user registration on NPATEL",
-            html:`<html><h1>OTP for PicHub User Registration</h1><p>Your OTP is ${ generatedOTP }</p></html>`
+            html: mailTemplate({name: req.body.email, otp:generatedOTP})
         }, ( err, data ) => {
             if (err){
                 res.status(501).json(generalResponseModel({code: 1106, error : err}))
