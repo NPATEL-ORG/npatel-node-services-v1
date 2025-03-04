@@ -3,3 +3,6 @@ package-lock.json
 
 # initial ignores -Sajeethan- :common
 .env
+dist
+.parcel*
+core-node-services
