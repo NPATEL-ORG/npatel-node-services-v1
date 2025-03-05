@@ -6,6 +6,8 @@ import { psqlFunctionCaller, timeLogger } from "spooky-node"
 import { verifyEmailModel } from "../models/otp-models.js"
 import { excludedOTPs } from "../configs/admins-config.js"
 import { generalResponseModel } from "../models/response-models.js"
+import { otpMailTemplate } from "../views/otpMailTemplate/otp-email-template.js"
+import { thankMailTemplate } from "../views/thankMailTemplate/thank-email-template.js"
 dotenv.config()
 
 export const otpGenerateController = async( req, res ) => {
@@ -17,14 +19,16 @@ export const otpGenerateController = async( req, res ) => {
             from: '"PicHub" <no-reply.pichub@auth.npatel.co.uk>',
             to: req.body.email,
             subject: "OTP Verification for user registration on NPATEL",
-            html:`<html><h1>OTP for PicHub User Registration</h1><p>Your OTP is ${ generatedOTP }</p></html>`
+            html: otpMailTemplate({name: req.body.email, otp:generatedOTP})
         }, ( err, data ) => {
             if (err){
-                res.status(501).json(generalResponseModel({code: 1106, error : err}))
+                res.status(501).json(generalResponseModel({code: 1106}))
+                console.log('Email sending failed --->', err)
                 timeLogger({incident: 'Neura returns error'})
             } else {
                 console.log(`OTP generated for ${ req.body.email } : ${ generatedOTP }`)
-                res.status(200).json(generalResponseModel({ code: 2104, message: data }))
+                res.status(200).json(generalResponseModel({ code: 2104 }))
+                console.log('Email sending success --->', data)
                 timeLogger({ incident: 'OTP Sent' })
             }
         })
@@ -48,6 +52,20 @@ export const otpVerifyController = async( req, res ) => {
                 timeLogger({ incident: 'OTP verification success' })
                 OTP_storageRemover(req.body.mail)
                 const verification = await psqlFunctionCaller(verifyEmailModel({ email: req.body.email, verify: true }))
+                transporter.sendMail({
+                    from: '"PicHub" <no-reply.pichub@auth.npatel.co.uk>',
+                    to: req.body.email,
+                    subject: "Welcome to Pichub",
+                    html: thankMailTemplate()
+                }, ( err, data ) => {
+                    if (err){
+                        console.log('Thank email sending failed --->', err)
+                        timeLogger({incident: 'Neura returns error'})
+                    } else {
+                        console.log('Thank email sending success --->', data)
+                        timeLogger({ incident: 'Thank email Sent' })
+                    }
+                })
                 res.status(200).json(generalResponseModel({ code: 2105 }))
             } else {
                 timeLogger({ incident: 'OTP verification failed' })
