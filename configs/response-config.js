@@ -79,4 +79,12 @@ export const responseObject = [
         code: 1402,
         msg: "Unauthorized without a token."
     },
+    {
+        code: 1110,
+        msg: "Pre-sign URL for upload generation failed."
+    },
+    {
+        code: 2110,
+        msg: "Pre-sign URL for upload generated success."
+    },
 ]
