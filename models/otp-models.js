@@ -7,7 +7,7 @@ export const verifyEmailModel = ({
     return {
         poolConfig: databaseConfig.poolConfig,
         schemaName: databaseConfig.schemaName,
-        sqlFunctionName: databaseConfig.verify_email,
+        sqlFunctionName: databaseConfig.psqlFunction_verifyEmail,
         params: [ email, verify ]
     }
 }

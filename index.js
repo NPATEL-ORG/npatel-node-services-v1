@@ -20,7 +20,7 @@ const corsOption = { credential:true, origin:'*' }
 app.use(cors({ corsOption }))
 app.use(json())
 app.use(cookieParser())
-app.use(fileUpload({debug:true}))
+app.use(fileUpload())
 
 app.use('/', express.static(join(__dirname, 'public')))
 app.use('/users', usersRouter)

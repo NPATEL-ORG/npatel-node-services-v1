@@ -87,4 +87,12 @@ export const responseObject = [
         code: 2110,
         msg: "Pre-sign URL for upload generated success."
     },
+    {
+        code: 1111,
+        msg: "Pre-sign URL for preview generation failed."
+    },
+    {
+        code: 2111,
+        msg: "Pre-sign URL for preview generated success."
+    },
 ]
