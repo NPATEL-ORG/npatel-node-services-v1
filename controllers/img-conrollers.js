@@ -5,6 +5,9 @@ import { dirname } from "path"
 import { fileURLToPath } from "url"
 import fs from 'fs'
 import { addNewImage, getImageList } from "../models/img-models.js"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { S3 } from "../configs/cr2-config.js"
+import { GetObjectAclCommand } from "@aws-sdk/client-s3"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -46,6 +49,28 @@ export const uploadPreSignURLController = async( req, res ) => {
             if (err) { return res.status(401).json(generalResponseModel({code: 1110, err})) }
             res.status(200).json(generalResponseModel({code:2110, url}))
         })
+    } catch (error) {
+        res.status(500).json(generalResponseModel({code: 1500, error}))
+        console.log('Error on image uploading.', error)
+        timeLogger({incident: 'Neura returns error'})
+    }
+}
+
+export const uploadPreSignURLControllerCR2 = async( req, res ) => {
+    try {
+        const { imageName, description, uploadedBy, tastes } = req.body
+        const imagePath = `image/${uploadedBy}`
+        const addImageMeta = await psqlFunctionCaller(addNewImage({imageName,imagePath,description,tastes,uploadedBy}))
+        try {
+            const url = await getSignedUrl( 
+                S3, 
+                new GetObjectAclCommand({ Bucket: "pichub-user-uploads", Key: `${imagePath}/${addImageMeta.rows[0]?.newimageid}.jpg` }),
+                { expiresIn: 5 * 60 }
+            ).then(url => res.status(200).json(generalResponseModel({code:2110, url}))
+            ).catch(err => res.status(401).json(generalResponseModel({code: 1110, err})))
+        } catch (err) {
+            return res.status(401).json(generalResponseModel({code: 1110, err}))
+        }
     } catch (error) {
         res.status(500).json(generalResponseModel({code: 1500, error}))
         console.log('Error on image uploading.', error)
