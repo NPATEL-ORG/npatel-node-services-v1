@@ -7,7 +7,7 @@ import fs from 'fs'
 import { addNewImage, getImageList } from "../models/img-models.js"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { S3 } from "../configs/cr2-config.js"
-import { GetObjectAclCommand } from "@aws-sdk/client-s3"
+import { GetObjectAclCommand, GetObjectCommand, PutObjectAclCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -64,7 +64,7 @@ export const uploadPreSignURLControllerCR2 = async( req, res ) => {
         try {
             const url = await getSignedUrl( 
                 S3, 
-                new GetObjectAclCommand({ Bucket: "pichub-user-uploads", Key: `${imagePath}/${addImageMeta.rows[0]?.newimageid}.jpg` }),
+                new PutObjectCommand({ Bucket: "pichub-user-uploads", Key: `${imagePath}/${addImageMeta.rows[0]?.newimageid}.jpg` }),
                 { expiresIn: 5 * 60 }
             ).then(url => res.status(200).json(generalResponseModel({code:2110, url}))
             ).catch(err => res.status(401).json(generalResponseModel({code: 1110, err})))
@@ -112,6 +112,45 @@ export const getCommonGallery = async( req, res ) => {
                     count: imageList.rows[i].outcount
                 })
             })
+        }
+        console.log('Gallery responded --->',gallery)
+        timeLogger({incident: "Public gallery responded"})
+        res.status(200).json(generalResponseModel({code:2111, gallery}))
+    } catch (error) {
+        res.status(500).json(generalResponseModel({code: 1500, error}))
+        console.log('Error on gallery listing.', error)
+        timeLogger({incident: 'Neura returns error'})
+    }
+}
+
+export const getCommonGalleryCR2 = async( req, res ) => {
+    try {
+        timeLogger({incident: "Public gallery requested"})
+        const { searchKey, limit, offset} = req.body
+        console.log('Public Gallery for ', req.body)
+        const imageList = await psqlFunctionCaller(getImageList({searchKey,limit,offset}))
+        let gallery = []
+        for (let i = 0; i < imageList.rows.length; i++ ){
+            let imageBucketPath = `${imageList.rows[i].outimagepath}/${imageList.rows[i].outimageid}.jpg` 
+            try {
+                const url = await getSignedUrl( 
+                    S3, 
+                    new GetObjectCommand({ Bucket: "pichub-user-uploads", Key: imageBucketPath}),
+                    { expiresIn: 5 * 60 }
+                ).then(url => {
+                    console.log(url)
+                    gallery.push({
+                        imageSrc:url,
+                        uploadedBy: imageList.rows[i].outuploadedby,
+                        likes: imageList.rows[i].outlikes,
+                        description: imageList.rows[i].outdescription,
+                        tastes: imageList.rows[i].outtastes,
+                        count: imageList.rows[i].outcount
+                    })
+                }).catch(err => res.status(401).json(generalResponseModel({code: 1111, err})))
+            } catch (err) {
+                return res.status(401).json(generalResponseModel({code: 1111, err}))
+            }
         }
         console.log('Gallery responded --->',gallery)
         timeLogger({incident: "Public gallery responded"})
