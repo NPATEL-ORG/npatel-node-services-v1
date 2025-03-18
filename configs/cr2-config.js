@@ -3,7 +3,7 @@ import dotenv from'dotenv'
 dotenv.config()
 
 export const S3 = new S3Client({
-    region: "auto",
+    region: "apac",
     endpoint: `https://${process.env.CR2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     credentials: {
         accessKeyId: process.env.CR2_ACCESS_KEY_ID,
