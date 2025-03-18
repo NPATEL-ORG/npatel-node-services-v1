@@ -43,7 +43,7 @@ export const uploadPreSignURLController = async( req, res ) => {
         const imagePath = `image/${uploadedBy}`
         const addImageMeta = await psqlFunctionCaller(addNewImage({imageName,imagePath,description,tastes,uploadedBy}))
         await minioClient.presignedPutObject('pichub-user-uploads', `${imagePath}/${addImageMeta.rows[0]?.newimageid}.jpg`, 5 * 60, (err, url) => {
-            if (err) { res.status(401).json(generalResponseModel({code: 1110, err})) }
+            if (err) { return res.status(401).json(generalResponseModel({code: 1110, err})) }
             res.status(200).json(generalResponseModel({code:2110, url}))
         })
     } catch (error) {
