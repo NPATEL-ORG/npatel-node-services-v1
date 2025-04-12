@@ -7,7 +7,8 @@ export const minioClient = new Minio.Client({
     port: process.env.MINIO_PORT,
     useSSL: true,
     accessKey: process.env.MINIO_ACCESS_KEY,
-    secretKey: process.env.MINIO_SECRET_KEY
+    secretKey: process.env.MINIO_SECRET_KEY,
+    region: 'us-east-1'
 })
 
 export const minioConfig = {
