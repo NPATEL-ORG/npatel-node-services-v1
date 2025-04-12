@@ -44,22 +44,6 @@ export const uploadPreSignURLController = async( req, res ) => {
         const { imageName, description, uploadedBy, tastes } = req.body
         const imagePath = `image/${uploadedBy}`
         const addImageMeta = await psqlFunctionCaller(addNewImage({imageName,imagePath,description,tastes,uploadedBy}))
-        await minioClient.presignedPutObject('pichub-user-uploads', `${imagePath}/${addImageMeta.rows[0]?.newimageid}.jpg`, 5 * 60, (err, url) => {
-            if (err) { return res.status(401).json(generalResponseModel({code: 1110, err})) }
-            res.status(200).json(generalResponseModel({code:2110, url}))
-        })
-    } catch (error) {
-        res.status(500).json(generalResponseModel({code: 1500, error}))
-        console.log('Error on image uploading.', error)
-        timeLogger({incident: 'Neura returns error'})
-    }
-}
-
-export const uploadPreSignURLControllerCR2 = async( req, res ) => {
-    try {
-        const { imageName, description, uploadedBy, tastes } = req.body
-        const imagePath = `image/${uploadedBy}`
-        const addImageMeta = await psqlFunctionCaller(addNewImage({imageName,imagePath,description,tastes,uploadedBy}))
         try {
             const url = await getSignedUrl( 
                 minioClient, 
@@ -90,39 +74,7 @@ export const viewPreSignURLController = ( req, res ) => {
     }
 }
 
-export const getCommonGallery = async( req, res ) => {
-    try {
-        timeLogger({incident: "Public gallery requested"})
-        const { searchKey, limit, offset} = req.body
-        console.log('Public Gallery for ', req.body)
-        const imageList = await psqlFunctionCaller(getImageList({searchKey,limit,offset}))
-        let gallery = []
-        for (let i = 0; i < imageList.rows.length; i++ ){
-            let imageBucketPath = `${imageList.rows[i].outimagepath}/${imageList.rows[i].outimageid}.jpg` 
-            console.log(imageBucketPath)
-            await minioClient.presignedGetObject('pichub-user-uploads', imageBucketPath, 60, (err, url) => {
-                if (err) { res.status(401).json(generalResponseModel({code: 1111, err})) }
-                gallery.push({
-                    imageSrc:url,
-                    uploadedBy: imageList.rows[i].outuploadedby,
-                    likes: imageList.rows[i].outlikes,
-                    description: imageList.rows[i].outdescription,
-                    tastes: imageList.rows[i].outtastes,
-                    count: imageList.rows[i].outcount
-                })
-            })
-        }
-        console.log('Gallery responded --->',gallery)
-        timeLogger({incident: "Public gallery responded"})
-        res.status(200).json(generalResponseModel({code:2111, gallery}))
-    } catch (error) {
-        res.status(500).json(generalResponseModel({code: 1500, error}))
-        console.log('Error on gallery listing.', error)
-        timeLogger({incident: 'Neura returns error'})
-    }
-}
-
-export const getCommonGalleryCR2 = async( req, res ) => {
+export const getCommonGalleryController = async( req, res ) => {
     try {
         timeLogger({incident: "Public gallery requested"})
         const { searchKey, limit, offset} = req.body
