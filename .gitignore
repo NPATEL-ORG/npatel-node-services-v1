@@ -6,3 +6,5 @@ package-lock.json
 dist
 .parcel*
 core-node-services
+test.*
+keys
