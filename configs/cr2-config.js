@@ -3,10 +3,11 @@ import dotenv from'dotenv'
 dotenv.config()
 
 export const S3 = new S3Client({
-    region: "apac",
-    endpoint: `https://${process.env.CR2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    region: "eu-west-2",
+    endpoint: `https://s3.npatelgroup.ltd`,
     credentials: {
-        accessKeyId: process.env.CR2_ACCESS_KEY_ID,
-        secretAccessKey: process.env.CR2_SECRET_ACCESS_KEY,
+        accessKeyId: process.env.MINIO_ACCESS_KEY,
+        secretAccessKey: process.env.MINIO_SECRET_KEY,
     },
+    forcePathStyle:'true'
 });

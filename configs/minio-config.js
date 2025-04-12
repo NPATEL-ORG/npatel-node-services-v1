@@ -1,14 +1,16 @@
-import * as Minio from 'minio'
+import { S3Client } from "@aws-sdk/client-s3"
 import dotenv from'dotenv'
 dotenv.config()
 
-export const minioClient = new Minio.Client({
-    endPoint: process.env.MINIO_ENDPOINT,
-    port: process.env.MINIO_PORT,
-    useSSL: false,
-    accessKey: process.env.MINIO_ACCESS_KEY,
-    secretKey: process.env.MINIO_SECRET_KEY
-})
+export const minioClient = new S3Client({
+    region: "eu-west-2",
+    endpoint: `https://s3.npatelgroup.ltd`,
+    credentials: {
+        accessKeyId: process.env.MINIO_ACCESS_KEY,
+        secretAccessKey: process.env.MINIO_SECRET_KEY,
+    },
+    forcePathStyle:'true'
+});
 
 export const minioConfig = {
     bucket:'pichub-assets-img',

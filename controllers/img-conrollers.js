@@ -6,7 +6,6 @@ import { fileURLToPath } from "url"
 import fs from 'fs'
 import { addNewImage, getImageList } from "../models/img-models.js"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { S3 } from "../configs/cr2-config.js"
 import { GetObjectAclCommand, GetObjectCommand, PutObjectAclCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -63,7 +62,7 @@ export const uploadPreSignURLControllerCR2 = async( req, res ) => {
         const addImageMeta = await psqlFunctionCaller(addNewImage({imageName,imagePath,description,tastes,uploadedBy}))
         try {
             const url = await getSignedUrl( 
-                S3, 
+                minioClient, 
                 new PutObjectCommand({ Bucket: "pichub-user-uploads", Key: `${imagePath}/${addImageMeta.rows[0]?.newimageid}.jpg` }),
                 { expiresIn: 5 * 60 }
             ).then(url => res.status(200).json(generalResponseModel({code:2110, url}))
@@ -134,7 +133,7 @@ export const getCommonGalleryCR2 = async( req, res ) => {
             let imageBucketPath = `${imageList.rows[i].outimagepath}/${imageList.rows[i].outimageid}.jpg` 
             try {
                 const url = await getSignedUrl( 
-                    S3, 
+                    minioClient, 
                     new GetObjectCommand({ Bucket: "pichub-user-uploads", Key: imageBucketPath}),
                     { expiresIn: 5 * 60 }
                 ).then(url => {
