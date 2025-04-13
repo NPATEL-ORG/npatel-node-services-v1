@@ -114,7 +114,6 @@ export const getCommonGalleryController = async( req, res ) => {
                     new GetObjectCommand({ Bucket: "pichub-user-uploads", Key: imageBucketPath}),
                     { expiresIn: 5 * 60 }
                 ).then(url => {
-                    console.log(url)
                     gallery.push({
                         imageSrc:url,
                         uploadedBy: imageList.rows[i].outuploadedby,
@@ -128,7 +127,7 @@ export const getCommonGalleryController = async( req, res ) => {
                 return res.status(401).json(generalResponseModel({code: 1111, err}))
             }
         }
-        console.log('Gallery responded --->',gallery)
+        console.log('Gallery responded --->',gallery.length,'images')
         timeLogger({incident: "Public gallery responded"})
         res.status(200).json(generalResponseModel({code:2111, gallery}))
     } catch (error) {
