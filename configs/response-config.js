@@ -95,4 +95,12 @@ export const responseObject = [
         code: 2111,
         msg: "Pre-sign URL for preview generated success."
     },
+    {
+        code: 1112,
+        msg: "Image table update failed."
+    },
+    {
+        code: 2112,
+        msg: "Image table update success."
+    },
 ]

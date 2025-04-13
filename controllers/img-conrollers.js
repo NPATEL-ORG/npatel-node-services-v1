@@ -4,7 +4,7 @@ import { minioClient, minioConfig } from "../configs/minio-config.js"
 import { dirname } from "path"
 import { fileURLToPath } from "url"
 import fs from 'fs'
-import { addNewImage, getImageList } from "../models/img-models.js"
+import { addNewImage, getImageList, imageUploaded } from "../models/img-models.js"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { GetObjectAclCommand, GetObjectCommand, PutObjectAclCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 
@@ -49,11 +49,36 @@ export const uploadPreSignURLController = async( req, res ) => {
                 minioClient, 
                 new PutObjectCommand({ Bucket: "pichub-user-uploads", Key: `${imagePath}/${addImageMeta.rows[0]?.newimageid}.jpg` }),
                 { expiresIn: 5 * 60 }
-            ).then(url => res.status(200).json(generalResponseModel({code:2110, url}))
+            ).then(url => res.status(200).json(generalResponseModel({code:2110, url, imageId:addImageMeta.rows[0]?.newimageid}))
             ).catch(err => res.status(401).json(generalResponseModel({code: 1110, err})))
         } catch (err) {
             return res.status(401).json(generalResponseModel({code: 1110, err}))
         }
+    } catch (error) {
+        res.status(500).json(generalResponseModel({code: 1500, error}))
+        console.log('Error on image uploading.', error)
+        timeLogger({incident: 'Neura returns error'})
+    }
+}
+
+export const uploadSuccessController = async( req, res ) => {
+    try {
+        const { imageId } = req.body
+        await psqlFunctionCaller(
+            imageUploaded({imageId})
+            ).then(imageIdRes => {
+                if(imageIdRes.rows[0].rimagaeid > 0) {
+                    res.status(200).json(generalResponseModel({code:2112, imageId: imageIdRes.rows[0].rimagaeid}))
+                    timeLogger({incident:  `Image table update for ${imageId} success`})
+                } else {
+                    res.status(404).json(generalResponseModel({code: 1112, err}))
+                    timeLogger({incident:  `Image table update for ${imageId} fail [image not found]`})
+                }
+        }).catch(err => {
+            res.status(401).json(generalResponseModel({code: 1112, err}))
+            timeLogger({incident:  `Image table update for ${imageId} fail`})
+            console.log(err)
+        })
     } catch (error) {
         res.status(500).json(generalResponseModel({code: 1500, error}))
         console.log('Error on image uploading.', error)
