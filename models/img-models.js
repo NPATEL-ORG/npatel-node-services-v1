@@ -15,6 +15,17 @@ export const addNewImage = ({
     }
 }
 
+export const imageUploaded = ({
+    imageId
+}) => {
+    return {
+        poolConfig: databaseConfig.poolConfig,
+        params: [imageId],
+        schemaName: databaseConfig.schemaName,
+        sqlFunctionName: databaseConfig.psqlFunction_uploadComplete
+    }
+}
+
 export const getImageList = ({
     searchKey,
     limit,

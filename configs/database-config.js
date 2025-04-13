@@ -17,6 +17,7 @@ const databaseConfig = {
     psqlFunction_verifyEmail: 'verify_user',
     psqlFunction_insertNewImage: 'insert_image_details',
     psqlFunction_getImageList: 'get_image_list',
+    psqlFunction_uploadComplete: 'upload_complete',
 }
 
 export default databaseConfig

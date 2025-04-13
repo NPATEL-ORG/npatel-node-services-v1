@@ -60,7 +60,7 @@ export const userLoginController = async ( req, res ) => {
                         code: 2103, 
                         ...tokens
                     }))
-                    console.log('Tokens generated for', rusername, tokens)
+                    console.log('Tokens generated for', rusername)
                     timeLogger({ incident: 'Tokens Generated' })
                 } else {
                     res.status(401).json(generalResponseModel({code:1103, msg}))
